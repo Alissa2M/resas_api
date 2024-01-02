@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export interface Prefecture {
-  prefCode: string;
+  prefCode: number;
   prefName: string;
 }
 
