@@ -1,0 +1,15 @@
+# Ignore artifacts:
+build
+coverage
+
+# dotfile
+.env*
+
+# markdown
+*.md
+
+# next.js
+/.next/
+
+# production
+/build
