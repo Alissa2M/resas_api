@@ -1,11 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-export interface Prefecture {
+export interface PrefectureApiProps {
   prefCode: number;
   prefName: string;
 }
 
-export async function getPrefectures(): Promise<Prefecture[]> {
+export async function getPrefectures(): Promise<PrefectureApiProps[]> {
   try {
     const apiKey = process.env.API_KEY;
     const response = await fetch(
@@ -19,7 +19,7 @@ export async function getPrefectures(): Promise<Prefecture[]> {
     );
 
     if (response.ok) {
-      const data = (await response.json()) as { result: Prefecture[] };
+      const data = (await response.json()) as { result: PrefectureApiProps[] };
       return data.result;
     }
     throw new Error('Failed to fetch data');
@@ -31,7 +31,7 @@ export async function getPrefectures(): Promise<Prefecture[]> {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Prefecture[]>,
+  res: NextApiResponse<PrefectureApiProps[]>,
 ) {
   const data = await getPrefectures();
   res.status(200).json(data);

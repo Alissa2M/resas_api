@@ -1,17 +1,37 @@
 import { GetServerSideProps } from 'next';
-import { Prefecture, getPrefectures } from './api/prefecture';
+import { useState } from 'react';
+import { PrefectureApiProps, getPrefectures } from './api/prefecture';
+import Prefecture from '../components/Prefecture';
 
 export interface HomeProps {
-  prefectures: Prefecture[];
+  prefectures: PrefectureApiProps[];
 }
 
 export default function Home({ prefectures }: HomeProps) {
+  const [checkedValues, setCheckedValues] = useState<string[]>([]);
+
+  const handleCheckbox = (value: string, checked: boolean) => {
+    setCheckedValues((prev) => {
+      if (checked) {
+        return [...prev, value];
+      }
+      return prev.filter((v) => v !== value);
+    });
+  };
+
   return (
-    <div>
-      <h1>都道府県一覧</h1>
-      <ul>
+    <div className="max-w-screen-lg mx-auto mt-8">
+      <h1 className="text-2xl mb-4">都道府県一覧</h1>
+      <ul className="grid grid-rows-8  grid-flow-col gap-2">
         {prefectures.map((prefecture) => (
-          <li key={prefecture.prefCode}>{prefecture.prefName}</li>
+          <li key={prefecture.prefCode}>
+            <Prefecture
+              label={prefecture.prefName}
+              value={prefecture.prefCode.toString()}
+              checked={checkedValues.includes(prefecture.prefCode.toString())}
+              onChange={handleCheckbox}
+            />
+          </li>
         ))}
       </ul>
     </div>
