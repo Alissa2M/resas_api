@@ -13,3 +13,9 @@ coverage
 
 # production
 /build
+
+# test
+/__test__/
+
+# storybook
+stories/
