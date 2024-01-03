@@ -5,7 +5,12 @@ export interface PrefectureProps {
   onChange: (value: string, checked: boolean) => void;
 }
 
-export default function Prefecture({ label, value, checked, onChange }: PrefectureProps) {
+export default function Prefecture({
+  label,
+  value,
+  checked,
+  onChange,
+}: PrefectureProps) {
   return (
     <label htmlFor={value}>
       <input
