@@ -15,7 +15,7 @@ coverage
 /build
 
 # test
-/__test__/
+__tests__/
 
 # storybook
 stories/
