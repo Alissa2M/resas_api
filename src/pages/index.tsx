@@ -1,7 +1,8 @@
-import { GetServerSideProps } from 'next';
-import { useState } from 'react';
-import { PrefectureApiProps, getPrefectures } from './api/resasApi';
-import Prefecture from '../components/Prefecture';
+import { GetServerSideProps } from "next";
+import { useState } from "react";
+import { PrefectureApiProps, getPrefectures } from "./api/resasApi";
+import Prefecture from "../components/Prefecture";
+import Population from "../components/Population";
 
 interface HomeProps {
   prefectures: PrefectureApiProps[];
@@ -9,10 +10,17 @@ interface HomeProps {
 
 export default function Home({ prefectures }: HomeProps) {
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
-  const [totalPopulationData, setTotalPopulationData] = useState<object[]>([]);
+  const [checkedPrefectures, setCheckedPrefectures] = useState<string[]>([]);
+  const [totalPopulationData, setTotalPopulationData] = useState<
+    { year: string; value: number }[][]
+  >([]);
   const [youngPopulationData, setYoungPopulationData] = useState<object[]>([]);
-  const [workingAgePopulationData, setWorkingAgePopulationData] = useState<object[]>([]);
-  const [elderlyPopulationData, setElderlyPopulationData] = useState<object[]>([]);
+  const [workingAgePopulationData, setWorkingAgePopulationData] = useState<
+    object[]
+  >([]);
+  const [elderlyPopulationData, setElderlyPopulationData] = useState<object[]>(
+    [],
+  );
 
   const handleCheckbox = async (value: string, checked: boolean) => {
     setCheckedValues((prev) => {
@@ -23,6 +31,18 @@ export default function Home({ prefectures }: HomeProps) {
     });
 
     const prefCodes = value;
+    const selectedPrefecture = prefectures.find(
+      (prefecture) => prefecture.prefCode.toString() === value,
+    );
+
+    if (selectedPrefecture) {
+      setCheckedPrefectures((prev) => {
+        if (checked) {
+          return [...prev, selectedPrefecture.prefName];
+        }
+        return prev.filter((name) => name !== selectedPrefecture.prefName);
+      });
+    }
 
     const fetchData = async () => {
       try {
@@ -32,19 +52,19 @@ export default function Home({ prefectures }: HomeProps) {
           const data = await response.json();
           setTotalPopulationData((prev) => [...prev, data.result.data[0].data]);
           setYoungPopulationData((prev) => [...prev, data.result.data[1].data]);
-          setWorkingAgePopulationData((prev) => [...prev, data.result.data[2].data]);
-          setElderlyPopulationData((prev) => [...prev, data.result.data[3].data]);
-          console.log(
-            totalPopulationData,
-            youngPopulationData,
-            workingAgePopulationData,
-            elderlyPopulationData,
-          );
+          setWorkingAgePopulationData((prev) => [
+            ...prev,
+            data.result.data[2].data,
+          ]);
+          setElderlyPopulationData((prev) => [
+            ...prev,
+            data.result.data[3].data,
+          ]);
         } else {
-          console.error('Error during fetch:', response.statusText);
+          console.error("Error during fetch:", response.statusText);
         }
       } catch (error) {
-        console.error('API request error:', error);
+        console.error("API request error:", error);
       }
     };
 
@@ -52,9 +72,9 @@ export default function Home({ prefectures }: HomeProps) {
   };
 
   return (
-    <div className="max-w-screen-lg mx-auto mt-8">
-      <h1 className="text-2xl mb-4">都道府県一覧</h1>
-      <ul className="grid grid-rows-8 grid-flow-col gap-2">
+    <div className="max-w-screen-lg mx-auto mt-2">
+      {/* <h1 className="text-2xl mb-2">都道府県一覧</h1> */}
+      <ul className="grid grid-rows-8 grid-flow-col gap-1">
         {prefectures.map((prefecture) => (
           <li key={prefecture.prefCode}>
             <Prefecture
@@ -66,6 +86,10 @@ export default function Home({ prefectures }: HomeProps) {
           </li>
         ))}
       </ul>
+      <Population
+        prefectureProps={checkedPrefectures}
+        totalPopulationProps={totalPopulationData}
+      />
     </div>
   );
 }
@@ -79,7 +103,7 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
       },
     };
   } catch (error) {
-    console.error('Error during fetch:', error);
+    console.error("Error during fetch:", error);
     return {
       props: {
         prefectures: [],
